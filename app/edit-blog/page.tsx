@@ -145,7 +145,7 @@ function PostEditorRow({
             value={post.title || ''}
             onChange={e => onChange({ title: e.target.value })}
             placeholder="Title"
-            className="w-full border border-gray-300 rounded px-2 py-1"
+            className="w-full border border-gray-300 rounded px-2 py-1 bg-[#f5f6fa]"
           />
         </div>
 
@@ -159,7 +159,7 @@ function PostEditorRow({
             value={post.author || ''}
             onChange={e => onChange({ author: e.target.value })}
             placeholder="Author"
-            className="w-full border border-gray-300 rounded px-2 py-1"
+            className="w-full border border-gray-300 rounded px-2 py-1 bg-[#f5f6fa]"
           />
         </div>
 
@@ -172,13 +172,13 @@ function PostEditorRow({
             type="date"
             value={post.date ? post.date.split('T')[0] : ''}
             onChange={e => onChange({ date: e.target.value })}
-            className="w-full border border-gray-300 rounded px-2 py-1"
+            className="w-full border border-gray-300 rounded px-2 py-1 bg-[#f5f6fa]"
           />
         </div>
       </div>
 
       {/* Description */}
-      <label className="font-semibold block text-xs text-gray-700 mb-1">
+      <label className="font-semibold block text-xs text-gray-700 mb-1 ">
         Description
       </label>
       <input
@@ -193,6 +193,7 @@ function PostEditorRow({
           border: '1px solid #ccc',
           borderRadius: '4px',
           padding: '0.25rem 0.5rem 0.25rem 0.25rem',
+          background: '#f5f6fa'
         }}
       />
 
@@ -213,7 +214,7 @@ function PostEditorRow({
               value={post.content || ''}
               onChange={e => onChange({ content: e.target.value })}
               placeholder="Write your Markdown here..."
-              className="block w-full min-h-[10rem] max-h-[60vh] border border-gray-300 rounded px-2 py-1 font-mono text-xs resize-y"
+              className="block w-full min-h-[10rem] max-h-[60vh] border border-gray-300 rounded px-2 py-1 font-mono text-xs resize-y className='bg-[#f5f6fa]'"
             />
           </div>
 
@@ -224,7 +225,7 @@ function PostEditorRow({
             </div>
 
             <div
-              className="w-full border border-gray-200 rounded px-3 py-2 text-sm bg-gray-50 overflow-auto"
+              className="w-full border border-[2px] border-[#152248] rounded px-3 py-2 text-sm bg-gray-50 overflow-auto"
               style={{
                 height: textareaHeight,
               }}
@@ -269,40 +270,52 @@ function PostEditorRow({
         </div>
       </div>
 
-      {/* Save button */}
-      <button
-        onClick={onSave}
-        style={{
-          backgroundColor: '#152248',
-          color: 'white',
-          border: '1px solid #152248',
-          borderRadius: '8px',
-          padding: '0.25rem 0.5rem',
-          cursor: 'pointer',
-          transition:
-            'background-color 0.15s ease, color 0.15s ease, transform 0.05s ease',
-        }}
-        onMouseEnter={e => {
-          e.currentTarget.style.backgroundColor = '#1c2d63'
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.backgroundColor = '#152248'
-          e.currentTarget.style.color = 'white'
-          e.currentTarget.style.transform = 'scale(1)'
-        }}
-        onMouseDown={e => {
-          e.currentTarget.style.backgroundColor = 'white'
-          e.currentTarget.style.color = '#152248'
-          e.currentTarget.style.transform = 'scale(0.96)'
-        }}
-        onMouseUp={e => {
-          e.currentTarget.style.backgroundColor = '#1c2d63'
-          e.currentTarget.style.color = 'white'
-          e.currentTarget.style.transform = 'scale(1)'
-        }}
-      >
-        Save
-      </button>
+      {/* save and status div */}
+      <div>
+
+        <button
+          onClick={onSave}
+          style={{
+            backgroundColor: '#152248',
+            color: 'white',
+            border: '1px solid #152248',
+            borderRadius: '8px',
+            padding: '0.25rem 0.5rem',
+            cursor: 'pointer',
+            transition:
+              'background-color 0.15s ease, color 0.15s ease, transform 0.05s ease',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.backgroundColor = '#1c2d63'
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.backgroundColor = '#152248'
+            e.currentTarget.style.color = 'white'
+            e.currentTarget.style.transform = 'scale(1)'
+          }}
+          onMouseDown={e => {
+            e.currentTarget.style.backgroundColor = 'white'
+            e.currentTarget.style.color = '#152248'
+            e.currentTarget.style.transform = 'scale(0.96)'
+          }}
+          onMouseUp={e => {
+            e.currentTarget.style.backgroundColor = '#1c2d63'
+            e.currentTarget.style.color = 'white'
+            e.currentTarget.style.transform = 'scale(1)'
+          }}
+        >
+          Save
+        </button>
+
+        [
+        status here
+        1. up to date
+        2. saving ...
+        3. unsaved changes!
+        ]
+
+      </div>
+
     </div>
   )
 }
