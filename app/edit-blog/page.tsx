@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import MarkdownGuide from '@/app/components/MarkdownGuide'
 
@@ -21,11 +21,7 @@ export default function EditBlogPage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    fetchPosts()
-  }, [])
-
-  async function fetchPosts() {
+  const fetchPosts = useCallback(async () => {
     setLoading(true)
     const { data, error } = await supabase
       .from('blog')
@@ -34,7 +30,11 @@ export default function EditBlogPage() {
     if (error) console.error(error)
     setPosts(data || [])
     setLoading(false)
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    fetchPosts()
+  }, [fetchPosts])
 
   async function updatePost(post: Post) {
     const { error } = await supabase
@@ -50,7 +50,6 @@ export default function EditBlogPage() {
     if (error) console.error(error)
   }
 
-  // helper to update local state for any field in a post
   function editLocalPost(id: number, patch: Partial<Post>) {
     setPosts(prev =>
       prev.map(p => (p.id === id ? { ...p, ...patch } : p)),
@@ -97,7 +96,6 @@ function PostEditorRow({
   onChange: (patch: Partial<Post>) => void
   onSave: () => void
 }) {
-  // ref + height for THIS row only
   const textareaRef = React.useRef<HTMLTextAreaElement | null>(null)
   const [textareaHeight, setTextareaHeight] = React.useState<number>(160)
 
@@ -105,7 +103,6 @@ function PostEditorRow({
     const el = textareaRef.current
     if (!el) return
 
-    // set initial height
     setTextareaHeight(el.offsetHeight)
 
     const observer = new ResizeObserver(entries => {
@@ -115,7 +112,6 @@ function PostEditorRow({
         }
       }
     })
-
 
     observer.observe(el)
 
@@ -133,9 +129,7 @@ function PostEditorRow({
         marginBottom: '1rem',
       }}
     >
-      {/* == top inputs == */}
       <div className="flex flex-col md:flex-row md:items-end gap-2 mb-2">
-        {/* Title */}
         <div className="flex-1 min-w-[200px]">
           <label className="font-semibold block text-xs text-gray-700 mb-1">
             Title
@@ -149,7 +143,6 @@ function PostEditorRow({
           />
         </div>
 
-        {/* Author */}
         <div className="flex-1 min-w-[200px]">
           <label className="font-semibold block text-xs text-gray-700 mb-1">
             Author
@@ -163,7 +156,6 @@ function PostEditorRow({
           />
         </div>
 
-        {/* Date */}
         <div className="flex-1 min-w-[150px]">
           <label className="font-semibold block text-xs text-gray-700 mb-1">
             Date
@@ -177,7 +169,6 @@ function PostEditorRow({
         </div>
       </div>
 
-      {/* Description */}
       <label className="font-semibold block text-xs text-gray-700 mb-1 ">
         Description
       </label>
@@ -197,14 +188,12 @@ function PostEditorRow({
         }}
       />
 
-      {/* === Content + Preview === */}
       <div className="mb-3">
         <label className="text-xs text-gray-600 block mb-1">Content</label>
 
         <div className="h-[2px] bg-[#152248] w-full rounded-full mb-3"></div>
 
         <div className="flex flex-col md:flex-row gap-3">
-          {/* Left: Editor */}
           <div className="flex-1 flex flex-col">
             <div className="text-[0.65rem] text-gray-500 mb-1 font-medium uppercase tracking-wide">
               Editor
@@ -218,7 +207,6 @@ function PostEditorRow({
             />
           </div>
 
-          {/* Right: Preview */}
           <div className="flex-1 flex flex-col">
             <div className="text-[0.65rem] text-gray-500 mb-1 font-medium uppercase tracking-wide">
               Preview
@@ -236,29 +224,25 @@ function PostEditorRow({
                     prose prose-sm max-w-none
                     prose-headings:text-[#152248]
                     prose-a:text-[#152248]
-
                     prose-code:bg-gray-200
                     prose-code:text-black
                     prose-code:px-[3px]
                     prose-code:py-[1px]
                     prose-code:rounded
-
                     prose-pre:bg-gray-200
                     prose-pre:text-black
                     prose-pre:rounded
                     prose-pre:p-2
                     prose-pre:text-[0.75rem]
                     prose-pre:overflow-x-auto
-
                     prose-img:rounded
                     prose-img:border
                     prose-img:border-gray-300
                   "
                 >
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    children={String(post.content ?? '')}
-                  />
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {String(post.content ?? '')}
+                  </ReactMarkdown>
                 </div>
               ) : (
                 <span className="text-gray-400 text-xs italic">
@@ -270,9 +254,7 @@ function PostEditorRow({
         </div>
       </div>
 
-      {/* save and status div */}
       <div>
-
         <button
           onClick={onSave}
           style={{
@@ -313,9 +295,7 @@ function PostEditorRow({
         2. saving ...
         3. unsaved changes!
         ]
-
       </div>
-
     </div>
   )
 }
