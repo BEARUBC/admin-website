@@ -1,91 +1,107 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+
+type Post = {
+  id: number
+  title: string | null
+  author: string | null
+  date: string | null
+  description: string | null
+  content: string | null
+}
 
 export default function EditBlogPage() {
   const supabase = createClient()
-  const [blog, setBlog] = useState<any[]>([])
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
+  const [posts, setPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    fetchBlog()
+    fetchPosts()
   }, [])
 
-  async function fetchBlog() {
-    const { data, error } = await supabase.from('blog').select()
+  async function fetchPosts() {
+    setLoading(true)
+    const { data, error } = await supabase.from('blog').select('*').order('id', { ascending: false })
     if (error) console.error(error)
-    setBlog(data || [])
+    setPosts(data || [])
+    setLoading(false)
   }
 
-  async function addPost() {
-    if (!title.trim() || !author.trim()) return
-    const { error } = await supabase.from('blog').insert({ title, author })
-    if (error) {
-      console.error('Insert error:', error)
-      return
-    }
-    setTitle('')
-    setAuthor('')
-    fetchBlog()
-  }
-
-  async function deletePost(id: number) {
-    const { error } = await supabase.from('blog').delete().eq('id', id)
+  async function updatePost(post: Post) {
+    const { error } = await supabase
+      .from('blog')
+      .update({
+        title: post.title,
+        author: post.author,
+        date: post.date,
+        description: post.description,
+        content: post.content,
+      })
+      .eq('id', post.id)
     if (error) console.error(error)
-    fetchBlog()
   }
 
   return (
-    <div className="p-4 space-y-4">
-      <h1 className="text-xl font-semibold">Edit Blog</h1>
+    <div style={{ padding: '1rem', fontFamily: 'sans-serif' }}>
+      <h1>Edit Blog Posts</h1>
 
-      <div className="flex flex-col gap-2 max-w-md">
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Title"
-          className="border p-2 rounded"
-        />
-        <input
-          type="text"
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
-          placeholder="Author"
-          className="border p-2 rounded"
-        />
-        <button
-          onClick={addPost}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          Add Post
-        </button>
-      </div>
+      {loading && <p>Loading...</p>}
 
-      <ul className="space-y-2">
-        {blog.map((post) => (
-          <li
-            key={post.id}
-            className="flex justify-between items-center border p-2 rounded"
-          >
-            <div>
-              <strong>{post.title}</strong> <em>by {post.author}</em>
-            </div>
-            <button
-              onClick={() => deletePost(post.id)}
-              className="text-red-500 hover:underline"
-            >
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
+      {posts.map((post) => (
+        <div key={post.id} style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem' }}>
+          <input
+            type="text"
+            value={post.title || ''}
+            onChange={(e) =>
+              setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, title: e.target.value } : p)))
+            }
+            placeholder="Title"
+            style={{ display: 'block', width: '100%', marginBottom: '0.5rem' }}
+          />
 
-      <pre className="bg-gray-100 p-2 rounded">
-        {JSON.stringify(blog, null, 2)}
-      </pre>
+          <input
+            type="text"
+            value={post.author || ''}
+            onChange={(e) =>
+              setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, author: e.target.value } : p)))
+            }
+            placeholder="Author"
+            style={{ display: 'block', width: '100%', marginBottom: '0.5rem' }}
+          />
+
+          <input
+            type="date"
+            value={post.date ? post.date.split('T')[0] : ''}
+            onChange={(e) =>
+              setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, date: e.target.value } : p)))
+            }
+            style={{ display: 'block', width: '100%', marginBottom: '0.5rem' }}
+          />
+
+          <input
+            type="text"
+            value={post.description || ''}
+            onChange={(e) =>
+              setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, description: e.target.value } : p)))
+            }
+            placeholder="Description"
+            style={{ display: 'block', width: '100%', marginBottom: '0.5rem' }}
+          />
+
+          <textarea
+            value={post.content || ''}
+            onChange={(e) =>
+              setPosts((prev) => prev.map((p) => (p.id === post.id ? { ...p, content: e.target.value } : p)))
+            }
+            placeholder="Content"
+            style={{ display: 'block', width: '100%', height: '120px', marginBottom: '0.5rem' }}
+          />
+
+          <button onClick={() => updatePost(post)}>Save</button>
+        </div>
+      ))}
     </div>
   )
 }
