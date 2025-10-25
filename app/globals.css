@@ -50,3 +50,12 @@ body {
 .bg-radial-gradient {
   background: radial-gradient(circle, var(--ternary), var(--secondary));
 }
+
+/* for markdown inline codeblock */
+.prose code::before {
+  content: none;
+}
+
+.prose code::after {
+  content: none;
+}
