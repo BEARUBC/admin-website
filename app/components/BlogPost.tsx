@@ -3,6 +3,7 @@
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { Edit3, Save, CheckCircle, Loader2 } from 'lucide-react'
 
 type Post = {
   id: number
@@ -24,12 +25,13 @@ export default function BlogPost({
 }) {
   const textareaRef = React.useRef<HTMLTextAreaElement | null>(null)
   const [textareaHeight, setTextareaHeight] = React.useState<number>(160)
+  const [isEditing, setIsEditing] = React.useState(false)
+  const [status, setStatus] = React.useState<'idle' | 'unsaved' | 'saving' | 'saved'>('idle')
 
   React.useEffect(() => {
     const el = textareaRef.current
     if (!el) return
     setTextareaHeight(el.offsetHeight)
-
     const observer = new ResizeObserver(entries => {
       for (const entry of entries) {
         if (entry.target === el) {
@@ -37,13 +39,32 @@ export default function BlogPost({
         }
       }
     })
-
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
 
   const labelClass =
     'font-semibold block text-[0.65rem] mb-1 uppercase tracking-wider text-secondary'
+
+  const handleEdit = () => {
+    setIsEditing(true)
+    setStatus('unsaved')
+  }
+
+  const handleSave = async () => {
+    setStatus('saving')
+    await onSave()
+    setTimeout(() => {
+      setStatus('saved')
+      setIsEditing(false)
+      setTimeout(() => setStatus('idle'), 2000)
+    }, 500)
+  }
+
+  const handleChange = (patch: Partial<Post>) => {
+    onChange(patch)
+    if (isEditing) setStatus('unsaved')
+  }
 
   return (
     <div className="rounded-md border border-primary/60 p-2 mb-4 bg-background">
@@ -54,9 +75,10 @@ export default function BlogPost({
           <input
             type="text"
             value={post.title || ''}
-            onChange={e => onChange({ title: e.target.value })}
+            onChange={e => handleChange({ title: e.target.value })}
             placeholder="Title"
             className="w-full border border-ternary/50 rounded px-2 py-1 bg-ternary/10 text-foreground"
+            disabled={!isEditing}
           />
         </div>
 
@@ -65,9 +87,10 @@ export default function BlogPost({
           <input
             type="text"
             value={post.author || ''}
-            onChange={e => onChange({ author: e.target.value })}
+            onChange={e => handleChange({ author: e.target.value })}
             placeholder="Author"
             className="w-full border border-ternary/50 rounded px-2 py-1 bg-ternary/10 text-foreground"
+            disabled={!isEditing}
           />
         </div>
 
@@ -76,8 +99,9 @@ export default function BlogPost({
           <input
             type="date"
             value={post.date ? post.date.split('T')[0] : ''}
-            onChange={e => onChange({ date: e.target.value })}
+            onChange={e => handleChange({ date: e.target.value })}
             className="w-full border border-ternary/50 rounded px-2 py-1 bg-ternary/10 text-foreground"
+            disabled={!isEditing}
           />
         </div>
       </div>
@@ -87,9 +111,10 @@ export default function BlogPost({
       <input
         type="text"
         value={post.description || ''}
-        onChange={e => onChange({ description: e.target.value })}
+        onChange={e => handleChange({ description: e.target.value })}
         placeholder="Description"
         className="block w-full mb-2 border border-ternary/50 rounded px-2 py-1 bg-ternary/10 text-foreground"
+        disabled={!isEditing}
       />
 
       {/* Editor + Preview */}
@@ -101,9 +126,12 @@ export default function BlogPost({
             <textarea
               ref={textareaRef}
               value={post.content || ''}
-              onChange={e => onChange({ content: e.target.value })}
+              onChange={e => handleChange({ content: e.target.value })}
               placeholder="Write your Markdown here..."
-              className="block w-full min-h-[20rem] max-h-[60vh] border border-ternary/50 rounded px-2 py-1 font-mono text-xs resize-y bg-ternary/10 text-foreground"
+              className={`block w-full min-h-[20rem] max-h-[60vh] border border-ternary/50 rounded px-2 py-1 font-mono text-xs resize-y text-foreground ${
+                isEditing ? 'bg-ternary/10' : 'bg-gray-100 cursor-not-allowed'
+              }`}
+              disabled={!isEditing}
             />
           </div>
 
@@ -143,17 +171,40 @@ export default function BlogPost({
         </div>
       </div>
 
-      {/* Save button + status */}
-      <div>
-        <button
-          onClick={onSave}
-          className="bg-primary text-background border border-primary rounded-lg px-2 py-1 transition-all hover:bg-secondary active:bg-background active:text-primary"
-        >
-          Save
-        </button>
+      {/* Save/Edit button + status */}
+      <div className="flex items-center gap-2">
+        {isEditing ? (
+          <button
+            onClick={handleSave}
+            className="flex items-center gap-1 bg-primary text-background border border-primary rounded-lg px-2 py-1 text-sm transition-all hover:bg-secondary active:bg-background active:text-primary"
+          >
+            <Save size={14} /> Save
+          </button>
+        ) : (
+          <button
+            onClick={handleEdit}
+            className="flex items-center gap-1 bg-secondary text-background border border-secondary rounded-lg px-2 py-1 text-sm transition-all hover:bg-primary active:bg-background active:text-primary"
+          >
+            <Edit3 size={14} /> Edit
+          </button>
+        )}
 
-        <div className="text-xs text-foreground/60 mt-1">
-          [ status here — up to date / saving... / unsaved changes! ]
+        <div className="flex items-center gap-1 text-xs text-foreground/70">
+          {status === 'unsaved' && (
+            <>
+              <Edit3 size={12} className="text-secondary" /> Unsaved changes
+            </>
+          )}
+          {status === 'saving' && (
+            <>
+              <Loader2 size={12} className="animate-spin text-secondary" /> Saving...
+            </>
+          )}
+          {status === 'saved' && (
+            <>
+              <CheckCircle size={12} className="text-green-600" /> Saved!
+            </>
+          )}
         </div>
       </div>
     </div>
