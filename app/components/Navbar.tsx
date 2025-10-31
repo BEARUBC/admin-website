@@ -27,7 +27,7 @@ const Navbar = () => {
       </div>
 
       <nav className="hidden md:flex space-x-4 tracking-wide">
-        <Link href="/edit-blog">EDIT BLOG</Link>
+        <Link href="/blogs-select">EDIT BLOGS</Link>
         <Link href="/edit-members">EDIT MEMBERS</Link>
       </nav>
 
@@ -39,7 +39,7 @@ const Navbar = () => {
 
       {open && (
         <nav className="absolute top-16 left-0 w-full bg-primary flex flex-col items-center space-y-4 p-8 md:hidden z-50 tracking-wide">
-          <Link href="/edit-blog" onClick={closeMenu}>EDIT BLOG</Link>
+          <Link href="/blogs-select" onClick={closeMenu}>EDIT BLOGS</Link>
           <Link href="/edit-members" onClick={closeMenu}>EDIT MEMBERS</Link>
         </nav>
       )}

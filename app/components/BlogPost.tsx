@@ -128,9 +128,8 @@ export default function BlogPost({
               value={post.content || ''}
               onChange={e => handleChange({ content: e.target.value })}
               placeholder="Write your Markdown here..."
-              className={`block w-full min-h-[20rem] max-h-[60vh] border border-ternary/50 rounded px-2 py-1 font-mono text-xs resize-y text-foreground ${
-                isEditing ? 'bg-ternary/10' : 'bg-gray-100 cursor-not-allowed'
-              }`}
+              className={`block w-full min-h-[20rem] max-h-[60vh] border border-ternary/50 rounded px-2 py-1 font-mono text-xs resize-y text-foreground ${isEditing ? 'bg-ternary/10' : 'bg-gray-100 cursor-not-allowed'
+                }`}
               disabled={!isEditing}
             />
           </div>
