@@ -1,14 +1,15 @@
 'use client'
 
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import MarkdownGuide from '@/app/components/MarkdownGuide'
 import BlogPost from '@/app/components/BlogPost'
 import Link from 'next/link'
-
-// icons
 import { ArrowLeft } from 'lucide-react'
+
+// Fix build error: mark this page as client-rendered only
+export const dynamic = 'force-dynamic'
 
 type Post = {
     id: number
@@ -19,7 +20,17 @@ type Post = {
     content: string | null
 }
 
+// ---- main wrapper with Suspense ----
 export default function EditBlogPage() {
+    return (
+        <Suspense fallback={<div className="p-4 text-center">Loading editor...</div>}>
+            <EditBlogContent />
+        </Suspense>
+    )
+}
+
+// ---- actual page logic separated ----
+function EditBlogContent() {
     const supabase = createClient()
     const searchParams = useSearchParams()
     const blogId = searchParams.get('blogId')
@@ -67,7 +78,8 @@ export default function EditBlogPage() {
         setPost(prev => (prev ? { ...prev, ...patch } : prev))
     }
 
-    if (!blogId) {
+    // ---- Fallback cases ----
+    if (!blogId)
         return (
             <div className="p-8 text-center font-sans text-foreground">
                 <h1 className="text-2xl font-semibold text-primary mb-4">
@@ -76,14 +88,11 @@ export default function EditBlogPage() {
                 <p className="mb-4 text-muted-foreground">
                     You must provide a <code>?blogId=</code> in the URL to edit a post.
                 </p>
-                <Link href="/blogs-select" className="text-primary underline">
-                    ← Back to blog list
-                </Link>
+                <StyledBackButton />
             </div>
         )
-    }
 
-    if (notFound) {
+    if (notFound)
         return (
             <div className="p-8 text-center font-sans text-foreground">
                 <h1 className="text-2xl font-semibold text-destructive mb-4">
@@ -92,32 +101,21 @@ export default function EditBlogPage() {
                 <p className="mb-4 text-muted-foreground">
                     The blog post with ID <strong>{blogId}</strong> doesn’t exist or was deleted.
                 </p>
-                <Link href="/blogs-select" className="text-primary underline">
-                    ← Back to blog list
-                </Link>
+                <StyledBackButton />
             </div>
         )
-    }
 
-    if (loading) {
+    if (loading)
         return (
             <div className="p-8 text-center font-sans text-foreground">
                 <p>Loading blog #{blogId}...</p>
             </div>
         )
-    }
 
+    // ---- Main editor ----
     return (
         <div className="p-4 font-sans bg-background text-foreground">
-
-            <Link
-                href="/blogs-select"
-                className="flex items-center gap-1 bg-secondary text-background border border-secondary rounded-lg px-2 py-1 text-sm transition-all hover:bg-primary active:bg-background active:text-primary mb-4 inline-flex"
-            >
-                <ArrowLeft size={14} /> Back to all blogs
-            </Link>
-
-
+            <StyledBackButton />
 
             <MarkdownGuide />
 
@@ -127,12 +125,20 @@ export default function EditBlogPage() {
             <div className="h-1 bg-primary w-full rounded-full my-2"></div>
 
             {post && (
-                <BlogPost
-                    post={post}
-                    onChange={editLocal}
-                    onSave={updatePost}
-                />
+                <BlogPost post={post} onChange={editLocal} onSave={updatePost} />
             )}
         </div>
+    )
+}
+
+// ---- consistent back button component ----
+function StyledBackButton() {
+    return (
+        <Link
+            href="/blogs-select"
+            className="flex items-center gap-1 bg-secondary text-background border border-secondary rounded-lg px-2 py-1 text-sm transition-all hover:bg-primary active:bg-background active:text-primary mb-4 inline-flex"
+        >
+            <ArrowLeft size={14} /> Back to all blogs
+        </Link>
     )
 }
