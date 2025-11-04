@@ -33,7 +33,8 @@ export default function BlogsSelectPage() {
   }, [supabase])
 
   return (
-    <div className="p-6 font-sans bg-background text-foreground">
+    // <div className="p-6 font-sans bg-background text-foreground">
+    <div className="p-6 bg-background text-foreground">
       <h1 className="text-2xl font-bold mb-4 text-primary">Blog Posts</h1>
       <div className="h-1 bg-primary w-full rounded-full my-2"></div>
       {loading && <p>Loading...</p>}
