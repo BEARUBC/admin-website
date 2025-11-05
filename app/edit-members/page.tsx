@@ -111,7 +111,7 @@ function EditMembersContent() {
       {/* <div className="h-1 bg-primary w-full rounded-full my-2"></div> */}
 
       <div className="w-full">
-        <div className="grid grid-cols-6 md:grid-cols-[1fr,1fr,1fr,1.25fr,3fr,1.25fr] gap-2 px-2 py-2 text-foreground/70 border-b border-ternary/30 items-center">
+        <div className="sticky top-0 z-10 bg-white shadow-sm grid grid-cols-6 md:grid-cols-[1fr,1fr,1fr,1.25fr,3fr,1.25fr] gap-2 px-2 py-2 text-foreground/70 border-b border-ternary/30 items-center">
           <div>{headerButton('First name', 'first_name')}</div>
           <div>{headerButton('Last name', 'last_name')}</div>
           <div>{headerButton('Team', 'team')}</div>
@@ -120,8 +120,10 @@ function EditMembersContent() {
           <div className={labelClass}>Link</div>
         </div>
 
-        {sortedMembers.map(m => (
-          <div key={m.id} className="grid grid-cols-6 md:grid-cols-[1fr,1fr,1fr,1.25fr,3fr,1.25fr] gap-2 items-center px-2 py-2 hover:bg-gray-50 rounded-md transition-colors">
+        {sortedMembers.map((m, i) => (
+
+          <div key={m.id} className={`grid grid-cols-6 md:grid-cols-[1fr,1fr,1fr,1.25fr,3fr,1.25fr] gap-2 items-center px-2 py-2 ${i % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-gray-100 rounded-md transition-colors`}>
+
             <div>
               {isEditing ? (
                 <input className={inputBase} value={m.first_name ?? ''} onChange={e => handleChange(m.id, { first_name: e.target.value })} />
