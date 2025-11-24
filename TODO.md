@@ -2,7 +2,7 @@
 
 ### General Tasks
 - [ ] **HIGH** - Set up authentication properly
-- [ ] **LOW** - Homepage: show log-in confirmation and a short welcome message
+- [ ] **MED** - Homepage: show log-in confirmation and a short welcome message
 - [ ] **LOW** - Decide standardized naming scheme for pages (e.g. `/blog-edit` vs `/edit-members`)
 
 ### Blogs Page (`/blogs-select`)
@@ -21,7 +21,7 @@
 # Main Site
 
 ### General Tasks
-- [ ] **HIGH** - Update outdated info (current events, projects, and stuff - we need to talk to other leads)
+- [ ] **MED** - Update outdated info (current events, projects, and stuff - we need to talk to other leads)
 
 ### Blog (`/blog`)
 - [ ] **HIGH** - Fetch blogs and thumbnails from supabase, display them
