@@ -2,7 +2,7 @@
 
 ### General Tasks
 - [ ] **HIGH** - Set up authentication properly
-- [ ] **MED** - Homepage: show log-in confirmation and a short welcome message
+- [x] **MED** - Homepage: show log-in confirmation and a short welcome message
 - [ ] **LOW** - Decide standardized naming scheme for pages (e.g. `/blog-edit` vs `/edit-members`)
 
 ### Blogs Page (`/blogs-select`)
